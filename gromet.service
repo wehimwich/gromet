@@ -1,0 +1,8 @@
+[Unit]
+Description=MET server for the Field System
+
+[Service]
+ExecStart=/usr2/st/bin/gromet
+
+[Install]
+WantedBy=multi-user.target
