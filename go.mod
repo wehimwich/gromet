@@ -3,8 +3,6 @@ module gromet
 go 1.12
 
 require (
-	github.com/influxdata/influxdb v1.7.7 // indirect
-	github.com/influxdata/influxdb1-client v0.0.0-20190402204710-8ff2fc3824fc
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/spf13/afero v1.2.2 // indirect
