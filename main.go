@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -35,6 +36,27 @@ type windstate struct {
 	t         time.Time
 	speed     float64
 	direction float64
+}
+
+func (ws *windstate) marshal() string {
+	if (ws.t == time.Time{}) {
+		return ",,"
+	}
+
+	w := bytes.Buffer{}
+
+	if math.IsNaN(ws.speed) {
+		w.WriteString(",")
+	} else {
+		fmt.Fprintf(&w, "%.1f,", ws.speed)
+	}
+
+	if math.IsNaN(ws.direction) {
+		w.WriteString(",")
+	} else {
+		fmt.Fprintf(&w, "%.1f,", ws.direction)
+	}
+	return w.String()
 }
 
 func openWindConn(addr string) <-chan windstate {
@@ -114,6 +136,35 @@ type metstate struct {
 
 	fanStatus bool
 	fanRate   float64
+}
+
+func (ms *metstate) marshal() string {
+	if (ms.t == time.Time{}) {
+		return ",,,"
+	}
+
+	w := bytes.Buffer{}
+
+	if math.IsNaN(ms.temperature) {
+		w.WriteString(",")
+	} else {
+		fmt.Fprintf(&w, "%.1f,", ms.temperature)
+	}
+
+	if math.IsNaN(ms.pressure) {
+		w.WriteString(",")
+	} else {
+		// NOTE: met server output expected to be in HPa
+		fmt.Fprintf(&w, "%.1f,", 1e3*ms.pressure)
+	}
+
+	if math.IsNaN(ms.humidity) {
+		w.WriteString(",")
+	} else {
+		// NOTE: met server output expected to be in HPa
+		fmt.Fprintf(&w, "%.1f,", ms.humidity)
+	}
+	return w.String()
 }
 
 const (
@@ -379,41 +430,30 @@ func main() {
 
 	for {
 		select {
+		case <-metTimer.C:
+			met = metstate{}
+			log.Println("reading from met device timed out")
 		case met = <-metStates:
 			if !metTimer.Stop() {
 				<-metTimer.C
 			}
 			metTimer.Reset(metTimeout)
-		case <-metTimer.C:
-			met = metstate{}
-			log.Println("reading from met device timed out")
 
+		case <-windTimer.C:
+			wind = windstate{}
+			log.Println("reading from wind device timed out")
 		case wind = <-windStates:
 			if !windTimer.Stop() {
 				<-windTimer.C
 			}
 			windTimer.Reset(windTimeout)
-		case <-windTimer.C:
-			wind = windstate{}
-			log.Println("reading from wind device timed out")
 
 		case conn := <-conns:
 			w := bufio.NewWriter(conn)
-			// Check for stale data
-			if (met.t == time.Time{}) {
-				fmt.Fprintf(w, ",,,")
-			} else {
-				fmt.Fprintf(w, "%.1f,%.1f,%.1f,", met.temperature, 1e3*met.pressure, met.humidity)
-			}
-
-			if (wind.t == time.Time{}) {
-				fmt.Fprintf(w, ",,")
-			} else {
-				fmt.Fprintf(w, "%.1f,%.0f,", wind.speed, wind.direction)
-			}
+			w.WriteString(met.marshal())
+			w.WriteString(wind.marshal())
 			w.Flush()
 			conn.Close()
 		}
 	}
-
 }
