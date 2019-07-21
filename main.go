@@ -377,11 +377,22 @@ func openListener(address string) chan net.Conn {
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintln(os.Stderr, "GrometVersion: ", GrometVersion)
-			fmt.Fprintln(os.Stderr, "GitCommit: ", GitCommit)
+			fmt.Fprintln(os.Stderr, "version:", GrometVersion)
+			fmt.Fprintln(os.Stderr, "commit:", GitCommit)
 			panic(err)
 		}
 	}()
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "version":
+			fmt.Println("version:", GrometVersion)
+			fmt.Println("commit:", GitCommit)
+			os.Exit(0)
+		default:
+			fmt.Printf("unknown command %q", os.Args[2])
+		}
+	}
 
 	log.SetPrefix("gromet: ")
 	log.SetFlags(0)
