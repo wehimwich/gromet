@@ -18,7 +18,6 @@ import (
 
 const fsErrorCommandDefault = "/usr2/fs/bin/lgerr"
 
-//
 type fsErrorWriter struct {
 	command string
 }
@@ -68,18 +67,37 @@ func openWindConn(addr string) <-chan windstate {
 				}
 
 				if err != nil {
-					log.Printf("error reading from met: %s", err)
+					log.Printf("error reading from wind device: %s", err)
+					conn.Close()
+					continue ConnLoop
+				}
+
+				if len(resp) <= 1 {
+					log.Printf("error reading from wind device: device returned no data")
+					conn.Close()
+					continue ConnLoop
 				}
 
 				fields := strings.FieldsFunc(resp[1:], func(r rune) bool { return r == ',' })
 
 				if len(fields) < 2 {
-					log.Printf("error reading from met: bad response %q", resp)
+					log.Printf("error reading from met: unexpected response %q", resp)
+					conn.Close()
+					continue ConnLoop
 				}
 
 				s.t = time.Now()
-				s.speed, _ = strconv.ParseFloat(fields[0], 64)
-				s.direction, _ = strconv.ParseFloat(fields[1], 64)
+				s.speed, err = strconv.ParseFloat(fields[0], 64)
+				if err != nil {
+					s.speed = math.NaN()
+					log.Printf("error decoding message wind device: wind speed given as %q", fields[0])
+				}
+
+				s.direction, err = strconv.ParseFloat(fields[1], 64)
+				if err != nil {
+					s.direction = math.NaN()
+					log.Printf("error decoding message wind device: wind direction given as %q", fields[1])
+				}
 				ws <- s
 			}
 		}
