@@ -17,6 +17,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+var GrometVersion string
+var GitCommit string
+
 const fsErrorCommandDefault = "/usr2/fs/bin/lgerr"
 
 type fsErrorWriter struct {
@@ -361,9 +364,7 @@ func openListener(address string) chan net.Conn {
 		for {
 			conn, err := l.Accept()
 			if err != nil {
-				log.Fatal(err)
-				conn.Close()
-				continue
+				log.Fatalf("unable to listen on addres %q: %s", address, err)
 			}
 			conns <- conn
 		}
@@ -374,6 +375,14 @@ func openListener(address string) chan net.Conn {
 }
 
 func main() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Fprintln(os.Stderr, "GrometVersion: ", GrometVersion)
+			fmt.Fprintln(os.Stderr, "GitCommit: ", GitCommit)
+			panic(err)
+		}
+	}()
+
 	log.SetPrefix("gromet: ")
 	log.SetFlags(0)
 
