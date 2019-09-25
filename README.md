@@ -12,11 +12,10 @@ Installation
 
 Install with 
 
-    go get github.com/nviinc/gromet
+    go get github.com/nvi-inc/gromet
 
-Setup
+Setup by running
 
      mkdir -p $HOME/.config/systemd/user/
      cp gromet.service $HOME/.config/systemd/user/
      systemctl --user enable gromet
-
