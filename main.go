@@ -459,18 +459,12 @@ func main() {
 			met = metstate{}
 			log.Println("reading from met device timed out")
 		case met = <-metStates:
-			if !metTimer.Stop() {
-				<-metTimer.C
-			}
 			metTimer.Reset(metTimeout)
 
 		case <-windTimer.C:
 			wind = windstate{}
 			log.Println("reading from wind device timed out")
 		case wind = <-windStates:
-			if !windTimer.Stop() {
-				<-windTimer.C
-			}
 			windTimer.Reset(windTimeout)
 
 		case conn := <-conns:
