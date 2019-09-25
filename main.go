@@ -106,7 +106,7 @@ func openWindConn(addr string) <-chan windstate {
 				fields := strings.FieldsFunc(resp[1:], func(r rune) bool { return r == ',' })
 
 				if len(fields) < 2 {
-					log.Printf("error reading from met: unexpected response %q", resp)
+					log.Printf("error reading from wind: unexpected response %q", resp)
 					conn.Close()
 					continue ConnLoop
 				}
@@ -221,15 +221,15 @@ func openMetConn(c *MetConfig, a AlertsConfig) <-chan metstate {
 
 				if err != nil {
 					log.Printf("error while reading from met device: %s", err)
-					time.Sleep(10 * time.Second)
 					conn.Close()
+					time.Sleep(10 * time.Second)
 					continue Conn
 				}
 
 				fields := strings.FieldsFunc(resp, func(r rune) bool { return r == ',' })
 
 				if len(fields) < 11 {
-					log.Printf("received bad response %q", resp)
+					log.Printf("received bad response from met device %q", resp)
 					conn.Close()
 					time.Sleep(10 * time.Second)
 					continue Conn
@@ -262,10 +262,12 @@ func openMetConn(c *MetConfig, a AlertsConfig) <-chan metstate {
 
 				if resp == "Selected hunt group busy" {
 					conn.Close()
+					time.Sleep(2 * time.Second)
 					continue Conn
 				}
 
 				if err == io.EOF {
+					log.Printf("error while reading fan status from met device: unexpected end of input")
 					conn.Close()
 					continue Conn
 				}
@@ -291,11 +293,14 @@ func openMetConn(c *MetConfig, a AlertsConfig) <-chan metstate {
 
 				if resp == "Selected hunt group busy" {
 					conn.Close()
+					time.Sleep(2 * time.Second)
 					continue Conn
 				}
 
 				if err == io.EOF {
+					log.Printf("error while reading fan rate from met device: unexpected end of input")
 					conn.Close()
+					time.Sleep(10 * time.Second)
 					continue Conn
 				}
 
