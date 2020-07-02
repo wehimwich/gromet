@@ -180,15 +180,6 @@ const (
 	MET4QueryCommand = "*0100P9\r\n"
 )
 
-func in(mem string, set []string) bool {
-	for _, s := range set {
-		if s == mem {
-			return true
-		}
-	}
-	return false
-}
-
 func openMetConn(c *MetConfig, a AlertsConfig) <-chan metstate {
 	s := metstate{}
 
