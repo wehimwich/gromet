@@ -16,7 +16,6 @@ install:
 	cp -i gromet.yml /usr2/control
 	systemctl --user daemon-reload
 	systemctl --user enable gromet
-	systemctl --user restart gromet
 
 gromet: main.go
 	go build  -ldflags "-X main.GitCommit=$(GIT_COMMIT) -X main.GrometVersion=$(GROMET_VERSION)"
