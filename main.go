@@ -395,7 +395,8 @@ func main() {
 			fmt.Println("commit:", GitCommit)
 			os.Exit(0)
 		default:
-			fmt.Printf("unknown command %q", os.Args[2])
+			fmt.Printf("unknown command %q\n", os.Args[1])
+			os.Exit(1)
 		}
 	}
 
