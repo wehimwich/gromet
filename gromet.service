@@ -2,9 +2,12 @@
 Description=MET server for the Field System
 
 [Service]
-ExecStart=/usr2/st/bin/gromet
+ExecStart=/usr2/st/gromet/gromet
 After=network-online.target
 Wants=network-online.target
+Restart=always
+User=oper
+Group=rtx
 
 [Install]
 WantedBy=multi-user.target

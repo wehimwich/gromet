@@ -12,9 +12,11 @@ Installation
 
 Install with
 
+    cd /usr2/st
     git clone github.com/nvi-inc/gromet.git
     cd gromet
-    make install
+    make
+    sudo make install
 
 This installs gromet and configures it to run on startup.
 
@@ -24,7 +26,7 @@ serial-to-ethernet converter, and start gromet with
     systemctl --user start gromet
 
 Note, this installation assumes you are using standard FS Linux directoires (under `/usr2`)
-for configuration and binaries and that you are using a systemd
+and user "oper', for that you are using a systemd
 based OS. If this do not match your setup, edit the makefile appropriately.
 
 Upgrading
@@ -32,8 +34,10 @@ Upgrading
 
 To upgrade, fetch the new source and reinstall
 
-    cd path/to/gromet
+    cd /usr2/st/gromet
     git pull
-    make install
+    make
+    # If update to service is needed
+    sudo make install
 
 You will be prompted to overwrite your configuration or not.
