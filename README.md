@@ -13,7 +13,7 @@ Installation
 Install with
 
     cd /usr2/st
-    git clone github.com/nvi-inc/gromet.git
+    git clone https://github.com/nvi-inc/gromet.git
     cd gromet
     make
     sudo make install
