@@ -7,7 +7,10 @@ met:
 wind:
   address: 192.168.0.2:10002
 
-# alerts:
+alerts:
+  fs:
+    enabled: false
+#     path: /usr2/fs/bin
 #   # If one component is known to be bad and you don't want to get alerts about it, 
 #   # uncomment the corresponding line below
 #   mask: 
@@ -17,9 +20,6 @@ wind:
 #   #  - temperature 
 #   #  - fan
 #   #  - wind
-#   fs:
-#     enabled: true
-#     path: /usr2/fs/bin
 #   email:
 #     enabled: true 
 #     addresses:

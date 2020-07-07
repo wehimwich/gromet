@@ -442,9 +442,10 @@ func main() {
 	log.Printf("listening on %s \n", c.ListenAddress)
 	conns := openListener(c.ListenAddress)
 
-	// TODO: load outputs from config
-
-	logOutputs := []io.Writer{os.Stderr, fsErrorWriter{fsErrorCommandDefault}}
+	logOutputs := []io.Writer{os.Stderr}
+	if c.Alerts.Fs.Enabled {
+		logOutputs = append(logOutputs, fsErrorWriter{fsErrorCommandDefault})
+	}
 	log.SetOutput(io.MultiWriter(logOutputs...))
 
 	var metStates <-chan metstate
