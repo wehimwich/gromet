@@ -1,10 +1,10 @@
 [Unit]
 Description=MET server for the Field System
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 ExecStart=/usr2/st/gromet/gromet
-After=network-online.target
-Wants=network-online.target
 Restart=always
 User=oper
 Group=rtx
