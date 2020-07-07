@@ -8,6 +8,8 @@ ExecStart=/usr2/st/gromet/gromet
 Restart=always
 User=oper
 Group=rtx
+ProtectSystem=strict
+ProtectHome=yes
 
 [Install]
 WantedBy=multi-user.target
