@@ -12,8 +12,10 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
@@ -369,6 +371,13 @@ func openListener(address string) chan net.Conn {
 
 }
 
+func Restart() {
+	err := syscall.Exec(os.Args[0], os.Args, os.Environ())
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
@@ -385,13 +394,15 @@ func main() {
 			fmt.Println("commit:", GitCommit)
 			os.Exit(0)
 		default:
-			fmt.Printf("unknown command %q\n", os.Args[1])
+			fmt.Fprintf(os.Stderr, "unknown command %q\n", os.Args[1])
 			os.Exit(1)
 		}
 	}
 
 	log.SetPrefix("gromet: ")
 	log.SetFlags(0)
+
+	log.Printf("starting...")
 
 	viper.SetConfigName("gromet")
 	viper.AddConfigPath("/etc/gromet/")
@@ -407,6 +418,14 @@ func main() {
 	viper.SetDefault("alerts.email.enabled", true)
 	viper.SetDefault("alerts.email.addresses", []string{"oper"})
 
+	viper.WatchConfig()
+	viper.OnConfigChange(func(in fsnotify.Event) {
+		log.Println("configuration changed, restarting...")
+		Restart()
+	})
+
+	log.Printf("loading configuration")
+
 	err := viper.ReadInConfig()
 
 	if err != nil {
@@ -420,11 +439,12 @@ func main() {
 		log.Fatalf("error parsing config file: %s \n", err)
 	}
 
+	log.Printf("listening on %s \n", c.ListenAddress)
 	conns := openListener(c.ListenAddress)
 
 	// TODO: load outputs from config
 
-	logOutputs := []io.Writer{os.Stdout, fsErrorWriter{fsErrorCommandDefault}}
+	logOutputs := []io.Writer{os.Stderr, fsErrorWriter{fsErrorCommandDefault}}
 	log.SetOutput(io.MultiWriter(logOutputs...))
 
 	var metStates <-chan metstate
