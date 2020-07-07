@@ -454,7 +454,7 @@ func main() {
 			metTimedOut = true
 		case met = <-metStates:
 			if metTimedOut {
-				log.Println("met device communication restorted")
+				log.Println("met device communication restored")
 				metTimedOut = false
 			} else {
 				if !metTimer.Stop() {
@@ -470,7 +470,7 @@ func main() {
 		case wind = <-windStates:
 			windTimer.Reset(windTimeout)
 			if windTimedOut {
-				log.Println("wind device communication restorted")
+				log.Println("wind device communication restored")
 				windTimedOut = false
 			} else {
 				if !windTimer.Stop() {
