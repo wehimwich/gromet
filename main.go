@@ -164,7 +164,6 @@ func (ms *metstate) marshal() string {
 	if math.IsNaN(ms.humidity) {
 		w.WriteString(",")
 	} else {
-		// NOTE: met server output expected to be in HPa
 		fmt.Fprintf(&w, "%.1f,", ms.humidity)
 	}
 	return w.String()
