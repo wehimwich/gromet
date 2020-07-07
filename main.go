@@ -430,6 +430,7 @@ func main() {
 
 	var metStates <-chan metstate
 	metTimer := new(time.Timer)
+	var metTimedOut bool
 	if c.Met != nil {
 		metStates = openMetConn(c.Met, c.Alerts)
 		metTimer = time.NewTimer(metTimeout)
@@ -437,6 +438,7 @@ func main() {
 
 	var windStates <-chan windstate
 	windTimer := new(time.Timer)
+	var windTimedOut bool
 	if c.Wind != nil {
 		windStates = openWindConn(c.Wind.Address)
 		windTimer = time.NewTimer(windTimeout)
@@ -450,13 +452,32 @@ func main() {
 		case <-metTimer.C:
 			met = metstate{}
 			log.Println("reading from met device timed out")
+			metTimedOut = true
 		case met = <-metStates:
+			if metTimedOut {
+				log.Println("met device communication restorted")
+				metTimedOut = false
+			} else {
+				if !metTimer.Stop() {
+					<-metTimer.C
+				}
+			}
 			metTimer.Reset(metTimeout)
 
 		case <-windTimer.C:
 			wind = windstate{}
 			log.Println("reading from wind device timed out")
+			windTimedOut = true
 		case wind = <-windStates:
+			windTimer.Reset(windTimeout)
+			if windTimedOut {
+				log.Println("wind device communication restorted")
+				windTimedOut = false
+			} else {
+				if !windTimer.Stop() {
+					<-windTimer.C
+				}
+			}
 			windTimer.Reset(windTimeout)
 
 		case conn := <-conns:
