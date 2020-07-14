@@ -7,7 +7,6 @@ GROMET_VERSION := $(shell git describe --tags --dirty)
 
 .PHONY: install
 install: $(TARGET)
-	cp $(TARGET) /usr/local/bin
 	mkdir -p /etc/systemd/system
 	cp -i gromet.service /etc/systemd/system
 	cp -i gromet.yml /usr2/control
