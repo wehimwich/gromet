@@ -1,43 +1,65 @@
-Gromet: the Go MET server
+_gromet_: the _go_ MET server
 =========================
 
-Gromet is a small server for multiplexing access to Paroscientific, Inc.
-MET3/4/4A  Meteorological Measurement System and Handar TSI Company Ultrasonic
-Wind Sensors. Currenlty only supports Perle serial-to-ethernet converter, though
-local serial connections or other s2e devices may be added upon request.
-
+_gromet_ is a small server for multiplexing access to Paroscientific,
+Inc. MET3/4/4A  Meteorological Measurement System and Vaisala WMT70x
+Ultrasonic Wind Sensors. It currenlty only supports Perle
+serial-to-ethernet converter, though local serial connections or other
+s2e devices may be added upon request.
 
 Installation
 ------------
 
-Install with
+(You must have the _go_ language installed. With FSLx this is usually done
+with _fsadapt_ as _root_.)
 
-    cd /usr2/st
+As _root_:
+
+    cd /usr2
     git clone https://github.com/nvi-inc/gromet.git
-    cd gromet
+    chmod -R prog.rtx gromet
+
+As _prog_:
+
+    cat <<EOF >>~/.profile
+    export GOPATH=~/go
+    PATH="$GOPATH/bin:/usr/local/go/bin:$PATH"
+    EOF
+    . ~/.profile
+    cd /usr2/gromet
     make
-    sudo make install
 
-This installs gromet and configures it to run on startup.
+As _root_:
 
-Then edit the configuration in `/usr2/control/gromet.yml` point to your
-serial-to-ethernet converter, and start gromet with
+    git config --global --add safe.directory /usr2/gromet
+    make install
 
-    systemctl --user start gromet
+This installs _gromet_ and configures it to run on startup.
 
-Note, this installation assumes you are using standard FS Linux directoires (under `/usr2`)
-and user "oper', for that you are using a systemd
-based OS. If this do not match your setup, edit the makefile appropriately.
+Then edit the configuration in _/usr2/control/gromet.yml_ point to
+your serial-to-ethernet converter, and start _gromet_ with
+
+    systemctl start gromet
+
+Note, this installation assumes you are using standard FS Linux
+directories (under _/usr2_) and user _oper_ and that you are using a
+`systemd` based OS. If this do not match your setup, edit the
+_Makefile_ appropriately.
 
 Upgrading
 ---------
 
 To upgrade, fetch the new source and reinstall
 
-    cd /usr2/st/gromet
+    cd /usr2/gromet
     git pull
     make
-    # If update to service is needed
-    sudo make install
+
+If an update to the service is needed, then as _root_:
+
+    make install
+    systemctl restart gromet
 
 You will be prompted to overwrite your configuration or not.
+Typically, you don't want to overwrite _/usr2/control/gromet.yml_ but
+it may need to be updated.

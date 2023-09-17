@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr2/st/gromet/gromet
+ExecStart=/usr2/gromet/gromet
 Restart=always
 User=oper
 Group=rtx
