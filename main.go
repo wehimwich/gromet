@@ -107,17 +107,17 @@ func openWindConn(addr string) <-chan windstate {
 
 				fields := strings.FieldsFunc(resp[1:], func(r rune) bool { return r == ',' })
 
-				if len(fields) < 2 {
+				if len(fields) < 3 {
 					log.Printf("error reading from wind: unexpected response %q", resp)
 					conn.Close()
 					continue ConnLoop
 				}
 
 				s.t = time.Now()
-				s.speed, err = strconv.ParseFloat(fields[0], 64)
+				s.speed, err = strconv.ParseFloat(fields[3], 64)
 				if err != nil {
 					s.speed = math.NaN()
-					log.Printf("error decoding message wind device: wind speed given as %q", fields[0])
+					log.Printf("error decoding message wind device: wind speed given as %q", fields[3])
 				}
 
 				s.direction, err = strconv.ParseFloat(fields[1], 64)
