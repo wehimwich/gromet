@@ -107,7 +107,7 @@ func openWindConn(addr string) <-chan windstate {
 
 				fields := strings.FieldsFunc(resp[1:], func(r rune) bool { return r == ',' })
 
-				if len(fields) < 3 {
+				if len(fields) < 4 {
 					log.Printf("error reading from wind: unexpected response %q", resp)
 					conn.Close()
 					continue ConnLoop
