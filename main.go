@@ -100,7 +100,7 @@ func openWindConn(addr string) <-chan windstate {
 				}
 
 				if len(resp) <= 1 {
-					log.Printf("error reading from wind device: device returned no data")
+					log.Printf("error reading from wind device: device sent no data")
 					conn.Close()
 					continue ConnLoop
 				}
@@ -108,7 +108,7 @@ func openWindConn(addr string) <-chan windstate {
 				fields := strings.FieldsFunc(resp[1:], func(r rune) bool { return r == ',' })
 
 				if len(fields) < 4 {
-					log.Printf("error reading from wind: unexpected response %q", resp)
+					log.Printf("error reading from wind: unexpected message %q", resp)
 					conn.Close()
 					continue ConnLoop
 				}
