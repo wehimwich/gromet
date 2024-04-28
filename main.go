@@ -113,17 +113,23 @@ func openWindConn(addr string) <-chan windstate {
 					continue ConnLoop
 				}
 
+				var was_err int
 				s.t = time.Now()
 				s.speed, err = strconv.ParseFloat(fields[3], 64)
 				if err != nil {
 					s.speed = math.NaN()
 					log.Printf("error decoding message wind device: wind speed given as %q", fields[3])
+					was_err = 1
+					log.Printf("wind message: %q", resp)
 				}
 
 				s.direction, err = strconv.ParseFloat(fields[1], 64)
 				if err != nil {
 					s.direction = math.NaN()
 					log.Printf("error decoding message wind device: wind direction given as %q", fields[1])
+					if was_err == 0 {
+						log.Printf("wind message: %q", resp)
+					}
 				}
 				ws <- s
 			}
