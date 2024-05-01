@@ -19,6 +19,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var last_email int = 0
+
 var GrometVersion string
 var GitCommit string
 
@@ -64,6 +66,55 @@ func (ws *windstate) marshal() string {
 	return w.String()
 }
 
+func errorReport(message string) {
+	log.Print(message)
+//        cmd := exec.Command("mail", "-s", "gromet error", "root")
+//	stdin, err := cmd.StdinPipe()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	go func() {
+//		defer stdin.Close()
+//		io.WriteString(stdin, message)
+//	}()
+//
+//	out, err := cmd.CombinedOutput()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	fmt.Printf("output %s\n", out)
+
+        cmd := exec.Command("mail", "-s", "gromet error", "root")
+
+        input := bytes.NewBufferString(message)
+	cmd.Stdin = input
+
+//        outputFile, err := os.Create("output.txt")
+//	if err != nil {
+//		fmt.Println("Error:", err)
+//		return
+//	}
+//	defer outputFile.Close()
+//	cmd.Stdout = outputFile
+//
+//	// Redirect the command's error stream to a buffer.
+//	var stderr bytes.Buffer
+//	cmd.Stderr = &stderr
+
+	// Run the command.
+//	err = cmd.Run()
+	cmd.Run()
+//	if err != nil {
+//		fmt.Println("Error:", err)
+//		fmt.Println("Error output:", stderr.String())
+//		return
+//	}
+//	fmt.Println("Command executed successfully.")
+//	// Run the command
+//	cmd.Run()
+}
 func openWindConn(addr string) <-chan windstate {
 	s := windstate{}
 	ws := make(chan windstate, 1)
@@ -393,6 +444,8 @@ func main() {
 		}
 	}()
 
+	log.Printf("beginning..")
+	errorReport(fmt.Sprintf("listening on %s", "hello"))
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "version":
